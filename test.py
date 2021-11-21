@@ -101,6 +101,11 @@ class Prisca(Employee):
     pass
 
 
+class Prisca(Employee):
+    name = "Prisca"
+    must = [*Employee.must, constraint_not(weekday(0))]
+
+
 p = Planning(
     "Librairie",
     "procure",

@@ -36,3 +36,11 @@ def weekend():
         return weekday == 5 or weekday == 6
 
     return i
+
+
+def weekday(day):
+    def i(p):
+        weekday = p.start.weekday()
+        return weekday == day
+
+    return i

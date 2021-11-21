@@ -66,6 +66,7 @@ class Resource:
 
     def can_work(self, period):
         for m in self.must:
+            # print(m.__name__, period, m(period))
             if not m(period):
                 return False
         return True
@@ -77,7 +78,7 @@ class Resource:
 class NonWorkingHours(Resource):
     name = "----"
     must = [
-        constraint_or(constraint_not(end_after(8)), constraint_not(start_before(18))),
+        constraint_or(end_before(8), start_after(18)),
     ]
 
 
@@ -89,8 +90,8 @@ class Weekends(Resource):
 class Employee(Resource):
     name = "Employee"
     must = [
-        constraint_not(start_before(8)),
-        constraint_not(end_after(18)),
+        start_after(8),
+        end_before(18),
         constraint_not(weekend()),
     ]
     should = []
@@ -98,12 +99,7 @@ class Employee(Resource):
 
 class Prisca(Employee):
     name = "Prisca"
-    pass
-
-
-class Prisca(Employee):
-    name = "Prisca"
-    must = [*Employee.must, constraint_not(weekday(0))]
+    must = [*Employee.must, constraint_not(weekday(4))]
 
 
 p = Planning(
@@ -113,6 +109,6 @@ p = Planning(
     datetime(2021, 11, 1),
     datetime(2021, 11, 8),
 )
-print(NonWorkingHours().can_work(Period(p, datetime(2021, 11, 1, 10))))
-p.fill()
-print(p)
+print(p.resources[2].can_work(Period(p, datetime(2021, 11, 1, 10))))
+# p.fill()
+# print(p)

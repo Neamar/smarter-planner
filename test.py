@@ -24,7 +24,8 @@ class Planning:
         self.resources = resources
         cursor = start
         while cursor < end:
-            self.periods.append(Period(planning=self, start=cursor))
+            p = Period(planning=self, start=cursor)
+            self.periods.append(p)
             cursor += period_length
 
     def __str__(self):
@@ -65,9 +66,9 @@ class Resource:
     should = []
 
     def can_work(self, period):
-        for m in self.must:
+        for constraint in self.must:
             # print(m.__name__, period, m(period))
-            if not m(period):
+            if not constraint(period, self):
                 return False
         return True
 
@@ -99,16 +100,26 @@ class Employee(Resource):
 
 class Prisca(Employee):
     name = "Prisca"
-    must = [*Employee.must, constraint_not(weekday(4))]
+    must = [*Employee.must, constraint_not(weekday(4)), max_hours_in_week(17)]
+
+
+class Charlotte(Employee):
+    name = "Charlotte"
+    must = [*Employee.must, constraint_not(weekday(1)), max_hours_in_week(17)]
+
+
+class Nicolas(Employee):
+    name = "Nicolas"
+    must = [*Employee.must, max_hours_in_week(17)]
 
 
 p = Planning(
     "Librairie",
     "procure",
-    [NonWorkingHours(), Weekends(), Prisca()],
+    [NonWorkingHours(), Weekends(), Prisca(), Charlotte(), Nicolas()],
     datetime(2021, 11, 1),
     datetime(2021, 11, 8),
 )
-print(p.resources[2].can_work(Period(p, datetime(2021, 11, 1, 10))))
-# p.fill()
-# print(p)
+# print(p.resources[2].can_work(Period(p, datetime(2021, 11, 1, 10))))
+p.fill()
+print(p)

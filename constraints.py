@@ -67,3 +67,23 @@ def max_hours_in_week(hours):
 
     i.__name__ = "[max_hours_in_week=%s]" % hours
     return i
+
+
+def max_hours_in_shift(hours):
+    def i(period, r):
+        periods = period.planning.periods
+        i = periods.index(period) - 1
+        count = 0
+        while i >= 0:
+            period_before = periods[i]
+            if period_before.assignment != r:
+                break
+
+            count += 1
+            if count >= hours:
+                return False
+            i -= 1
+        return True
+
+    i.__name__ = "[max_hours_in_shift=%s]" % hours
+    return i

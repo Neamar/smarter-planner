@@ -93,6 +93,8 @@ class Employee(Resource):
     must = [
         start_after(8),
         end_before(18),
+        max_hours_in_shift(6),
+        max_hours_in_week(17),
         constraint_not(weekend()),
     ]
     should = []
@@ -100,17 +102,17 @@ class Employee(Resource):
 
 class Prisca(Employee):
     name = "Prisca"
-    must = [*Employee.must, constraint_not(weekday(4)), max_hours_in_week(17)]
+    must = [*Employee.must, constraint_not(weekday(4))]
 
 
 class Charlotte(Employee):
     name = "Charlotte"
-    must = [*Employee.must, constraint_not(weekday(1)), max_hours_in_week(17)]
+    must = [*Employee.must, constraint_not(weekday(1))]
 
 
 class Nicolas(Employee):
     name = "Nicolas"
-    must = [*Employee.must, max_hours_in_week(17)]
+    must = [*Employee.must]
 
 
 p = Planning(

@@ -24,11 +24,16 @@ class Planning:
         self.resources = resources
         cursor = start
         while cursor < end:
+            # Create all periods within that time span
             p = Period(planning=self, start=cursor)
             self.periods.append(p)
             cursor += period_length
 
     def __str__(self):
+        """
+        Display a nicely rendered view of the planning,
+        day by day, hour by hour
+        """
         hours = sorted(set([p.start.hour for p in self.periods]))
         days = sorted(set([p.start.date() for p in self.periods]))
         out = []
@@ -40,11 +45,23 @@ class Planning:
             out.append(today)
         return tabulate(zip(hours, *out), headers=["hours", *days])
 
-    def fill(self):
-        for period in self.periods:
-            for resource in self.resources:
-                if resource.can_work(period):
-                    period.assignment = resource
+    def fill(self, index=0):
+        """
+        Fill out the planning according to current constraint
+        """
+        if index >= len(self.periods):
+            return True
+
+        period = self.periods[index]
+        available_resources = [r for r in self.resources if r.can_work(period)]
+        for resource in available_resources:
+            period.assignment = resource
+            r = self.fill(index + 1)
+            if r:
+                return True
+            # otherwise, it's not working, try next resource
+            period.assignment = None
+        return False
 
 
 class Period:
@@ -63,7 +80,6 @@ class Period:
 class Resource:
     name = ""
     must = []
-    should = []
 
     def can_work(self, period):
         for constraint in self.must:
@@ -97,7 +113,6 @@ class Employee(Resource):
         max_hours_in_week(17),
         constraint_not(weekend()),
     ]
-    should = []
 
 
 class Prisca(Employee):
@@ -123,5 +138,7 @@ p = Planning(
     datetime(2021, 11, 8),
 )
 # print(p.resources[2].can_work(Period(p, datetime(2021, 11, 1, 10))))
-p.fill()
+r = p.fill()
 print(p)
+if not r:
+    print("Unsolvable.")

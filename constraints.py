@@ -1,4 +1,8 @@
 def constraint_not(c):
+    """
+    Resource must *not* match specified constraint
+    """
+
     def i(p, r):
         return not c(p, r)
 
@@ -7,6 +11,10 @@ def constraint_not(c):
 
 
 def constraint_or(c1, c2):
+    """
+    Resource can match one or two of the specified constraint
+    """
+
     def i(p, r):
         return c1(p, r) or c2(p, r)
 
@@ -15,6 +23,10 @@ def constraint_or(c1, c2):
 
 
 def start_after(hour):
+    """
+    Shift must start after, or at, specified hour
+    """
+
     def i(p, r):
         return p.start.hour >= hour
 
@@ -23,6 +35,10 @@ def start_after(hour):
 
 
 def end_before(hour):
+    """
+    Shift must end before, or at, specified hour
+    """
+
     def i(p, r):
         return p.start.hour < hour
 
@@ -31,6 +47,10 @@ def end_before(hour):
 
 
 def weekend():
+    """
+    Shift must be on weekend
+    """
+
     def i(p, r):
         weekday = p.start.weekday()
         return weekday == 5 or weekday == 6
@@ -40,6 +60,10 @@ def weekend():
 
 
 def weekday(day):
+    """
+    Shift must be on specified day
+    """
+
     def i(p, r):
         weekday = p.start.weekday()
         return weekday == day
@@ -49,6 +73,10 @@ def weekday(day):
 
 
 def max_hours_in_week(hours):
+    """
+    Resource must not have more than specified hours in a week
+    """
+
     def i(period, r):
         periods = period.planning.periods
         week = period.start.isocalendar().week
@@ -70,6 +98,10 @@ def max_hours_in_week(hours):
 
 
 def max_hours_in_shift(hours):
+    """
+    Resource must not have more than specified hours without a break
+    """
+
     def i(period, r):
         periods = period.planning.periods
         i = periods.index(period) - 1
